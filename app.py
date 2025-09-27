@@ -1,5 +1,3 @@
-# app.py
-
 import os
 import math
 from typing import List
@@ -77,13 +75,13 @@ def top1_rrf(query: str, dense_k: int = 200, sparse_k: int = 400):
         ],
         query=models.FusionQuery(fusion=models.Fusion.RRF),
         with_payload=True,
-        limit=1,  # 
+        limit=1,   
     )
     return res.points[0] if res.points else None
 
 
 # UI
-st.set_page_config(page_title="Notebook RAG Search (Top-1)", page_icon="🔎", layout="wide")
+st.set_page_config(page_title="Notebook RAG Search",layout="wide")
 st.title(" Finance Domain Question and Answer")
 
 with st.sidebar:
@@ -113,7 +111,6 @@ def render_best(point: models.ScoredPoint | None):
     st.subheader("Best answer")
     with st.container(border=True):
         st.caption(f"Source: `{src}`" + (f" • score: {score:.4f}" if score is not None else ""))
-        # show as body text (not a long code block) for readability
         st.write(text if len(text) <= 4000 else text[:4000] + "…")
 
 if go and query.strip():
@@ -127,4 +124,4 @@ if go and query.strip():
     render_best(best)
 
 st.markdown("---")
-st.caption("Returns only the top-ranked passage from your Qdrant collection (dense/sparse/RRF).")
+st.caption("Returns only the top-ranked passage (dense/sparse/RRF).")
