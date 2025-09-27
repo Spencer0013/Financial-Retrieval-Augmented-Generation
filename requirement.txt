@@ -1,0 +1,9 @@
+streamlit
+qdrant-client
+fastembed
+pandas
+tqdm
+torch
+transformers
+sentencepiece
+safetensors
