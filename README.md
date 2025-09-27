@@ -14,7 +14,7 @@ Streamlit app for quick demos
 
 ## Project Structure
 
-.
+
 ├── app.py                         
 ├── data_preparation.ipynb         
 ├── Exploration and Validation.ipynb
@@ -41,7 +41,6 @@ The notebook is written to produce a collection named fiqa-hybrid to match the a
 
 ## Run the App
 
-# Optional: override defaults
 export QDRANT_URL="http://localhost:6333"
 export QDRANT_COLLECTION="fiqa-hybrid"
 export EMBED_MODEL="BAAI/bge-small-en-v1.5"
@@ -78,15 +77,8 @@ EMBED_MODEL="BAAI/bge-small-en-v1.5"
 
 An example run over 500 queries(dev.tsv) @ k=10 produced:
 
-metric	         dense	     sparse	     rrf
-- hit_rate	    0.646	     0.482	     0.640
-- mrr	        0.458806	 0.317209	 0.453963
-- precision@k	0.1018	     0.0640	     0.0968
-- recall@k	    0.646	     0.482	     0.640
-- map@k	        0.429211	 0.303039	 0.428284
-- ndcg@k	    0.491362	 0.350267	 0.488299
-- f1@k	        0.168721	 0.109754	 0.162053
-- queries	      500	      500	       500
+<img width="581" height="423" alt="image" src="https://github.com/user-attachments/assets/f985173d-1c0a-407d-8b6f-9edbd30db189" />
+
 
 
 ## How It Works 
