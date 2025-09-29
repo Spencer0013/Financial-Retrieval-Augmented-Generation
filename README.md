@@ -3,7 +3,7 @@
 A practical, end-to-end RAG pipeline for finance questions powered by Qdrant (dense, sparse, and RRF hybrid search), FastEmbed embeddings, and a Streamlit app for interactive querying. It includes notebooks for data prep and evaluation plus a lightweight UI that returns the top-ranked passage.
 
 ## Demo (Screenshot)
-![alt text](image.png)
+https://1drv.ms/i/c/50c5cfe66d856efa/EXJhUJYWjZlPtXUxpa_XdE4BEgXR5MQZbKcuMd2vq3g3kg?e=f10dCE
 
 ## Highlights
 
