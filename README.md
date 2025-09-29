@@ -81,6 +81,67 @@ An example run over 500 queries(dev.tsv) @ k=10 produced:
 
 
 
+## Rag Evaluation
+
+Evaluator prompt (system + user)
+
+The answer is injected verbatim between <<<ANSWER>>> and <<<END>>> to avoid accidental prompt mixing.
+
+The evaluator is instructed to output JSON only (no prose, no backticks), so downstream parsing is reliable.
+
+## Inputs to the evaluator
+
+For each example:
+
+question: the user query.
+
+context: the retrieved snippets the generator saw (the notebook builds these earlier).
+
+answer: the generator’s output (verbatim).
+
+The context is not pasted directly into the evaluator prompt body shown above; instead, the rubric requires the evaluator to judge grounding against the same context that produced the answer. (Implementation-wise, the notebook wraps or references that context when calling the evaluator model so the judgment is actually conditioned on it.)
+
+## Batch evaluation loop
+
+For each retrieval mode (dense, sparse, rrf) and for each evaluation query:
+
+Retrieve context (K results).
+
+Generate the answer with the RAG model.
+
+Evaluate using JSON judgment.
+
+Log the outcome (question, answer, label, and explanation)
+
+The notebook uses a progress bar (tqdm) and caches intermediate results in memory; you can export to CSV/JSON if desired.
+
+## Metrics & reporting
+
+From the collected judgments the notebook computes:
+
+Relevance rate (accuracy):
+#(RELEVANT) / total, per mode and overall.
+
+Breakdown by retrieval mode: dense vs. sparse vs. RRF.
+
+Error slices:
+
+Examples flagged IRRELEVANT with evaluator explanations.
+
+Random samples of RELEVANT cases for manual spot-checks.
+
+## What the outputs mean
+
+A high RELEVANT rate under RRF indicates the hybrid retriever is delivering better grounding than dense-only or sparse-only.
+
+IRRELEVANT examples + explanations help you pinpoint:
+
+missing/weak context,
+
+generator drift (generic answers),
+
+or contradictions with retrieved facts.
+
 ## How It Works 
 
 1. Chunking & Embedding
