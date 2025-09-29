@@ -10,7 +10,7 @@ Local or remote Qdrant support
 
 Reproducible evaluation with provided notebook and CSV
 
-Streamlit app for quick demos
+Streamlit app for quick demos 
 
 ## Project Structure
 
