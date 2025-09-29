@@ -1,11 +1,14 @@
 __pycache__/
 *.pyc
 *.ipynb_checkpoints/
-data/
+
 hf_models/
 offload_cache/
-*.csv
+
 *.pt
 *.bin
 *.parquet
 .DS_Store
+data/*
+!data/df_eval.csv
+!data/.gitkeep
