@@ -1,187 +1,212 @@
 ## Financial Retrieval-Augmented Generation (RAG) — Finance Domain
 
-A practical, end-to-end RAG pipeline for finance questions powered by Qdrant (dense, sparse, and RRF hybrid search), FastEmbed embeddings, and a Streamlit app for interactive querying. It includes notebooks for data prep and evaluation plus a lightweight UI that returns the top-ranked passage.
+A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone hybrid search (dense + sparse)**, `sentence-transformers` embeddings, and a Streamlit app for interactive querying. It includes notebooks for data prep and evaluation plus a lightweight UI that returns an answer grounded in the top-ranked passage.
 
 ## Demo (Screenshot)
 <img width="1918" height="1004" alt="Screenshot 2025-09-29 101201" src="https://github.com/user-attachments/assets/36f6736a-7372-4a75-a340-a2e039f3f264" />
 
+---
 
 ## Highlights
 
-Dense (BGE-small) + Sparse (BM25) + Reciprocal Rank Fusion (RRF)
+- Dense (`sentence-transformers/all-MiniLM-L6-v2`) + Sparse (BM25 via `pinecone-text`) + Hybrid in Pinecone  
+- Pinecone serverless index for storage and retrieval  
+- Reproducible evaluation with provided notebook and CSV  
+- Streamlit app for quick demos  
+- RAG chain that constrains the model to only use retrieved context (and say “I don’t know” if the answer is not supported)
 
-Local or remote Qdrant support
-
-Reproducible evaluation with provided notebook and CSV
-
-Streamlit app for quick demos 
+---
 
 ## Project Structure
 
+```text
+├── app.py                        # Streamlit application for interactive Q/A
+├── helpers.py                    # Retrieval + RAG chain builder, judge prompt
+├── evaluation.py                 # Batch evaluation script
+├── data_preparation.ipynb        # Data cleaning / chunking / indexing workflow
+├── hybrid_search.ipynb           # Retrieval experiments and diagnostics
+├── bm25_values.json              # Saved BM25 state (sparse encoder stats)
+├── eval_results.csv              # Example evaluation output
+├── requirements.txt              # Dependencies
+└── README.md
+```
 
-├── app.py                         
-├── data_preparation.ipynb         
-├── Exploration and Validation.ipynb
-├── df_eval.csv                   
-└── README.md                      
+> **Note:** earlier versions referenced Qdrant. The current pipeline uses **Pinecone** as the vector DB and hybrid retriever.
 
-## 1) Start Qdrant
+---
 
-Run Qdrant locally with Docker:
+## 1️⃣ Start / Prepare Pinecone
 
-docker run -p 6333:6333 -p 6334:6334 -v $(pwd)/qdrant_storage:/qdrant/storage qdrant/qdrant
+You do not run Pinecone locally with Docker — it’s a managed service.  
+Instead:
 
-## 2) Create the Collection & Upload Vectors
+1. Create a Pinecone account / API key.  
+2. Set environment variables (see below).  
+3. The code will create (or reuse) a serverless Pinecone index with the expected name (default: `fiqa-hybrid`).
 
-Load finance corpus / notebook chunks
+**Index details (from `helpers.py`):**
+- Dimension: `384`
+- Metric: `dotproduct`
+- Cloud/region: `aws` / `us-east-1` (can be changed in code)
 
-Compute dense embeddings with FastEmbed (BAAI/bge-small-en-v1.5)
+---
 
-Create a multi-vector (dense + bm25) collection in Qdrant
+## 2️⃣ Create the Index & Upload Vectors
 
-Upload points with payload (e.g., text, filename/source, etc.)
+The workflow in `data_preparation.ipynb` / ingestion script does the following:
 
-The notebook is written to produce a collection named fiqa-hybrid to match the app defaults.
+- Load finance corpus / notebook chunks  
+- Fit a BM25 encoder:
+  ```python
+  from pinecone_text.sparse import BM25Encoder
+  bm25 = BM25Encoder().default()
+  bm25.fit(texts)
+  bm25.dump("bm25_values.json")
+  ```
+- Compute dense embeddings with `sentence-transformers/all-MiniLM-L6-v2`
+- Upsert **both** dense and sparse vectors into the Pinecone index along with metadata
 
-## Run the App
+> ⚠️ After you upsert once, your vectors live in Pinecone permanently.  
+> You do **not** need to re-upsert unless you add new data.  
+> Keep the `bm25_values.json` file — it’s required at query time to encode new user queries into sparse form.
 
-export QDRANT_URL="http://localhost:6333"
-export QDRANT_COLLECTION="fiqa-hybrid"
-export EMBED_MODEL="BAAI/bge-small-en-v1.5"
+---
 
+## 3️⃣ Run the App
+
+Set your environment variables in a `.env` file or via shell.  
+**Required:**
+
+```bash
+OPENAI_API_KEY="your OpenAI API key"
+PINECONE_API_KEY="your Pinecone API key"
+PINECONE_INDEX_NAME="fiqa-hybrid"
+BM25_STATE_PATH="C:\path\to\bm25_values.json"
+```
+
+Then launch:
+
+```bash
 streamlit run app.py
+```
 
-## Using the App
+### What `app.py` does
+- Loads env vars  
+- Loads the saved BM25 state (`bm25_values.json`)  
+- Connects to the existing Pinecone index (`fiqa-hybrid`)  
+- Builds a RAG chain with:
+  - `PineconeHybridSearchRetriever` (dense + sparse hybrid search)
+  - `gpt-4o-mini` as the generator  
+- Lets you ask finance questions and returns grounded answers
 
-Type a question (e.g., “What is corporate finance?”).
+---
 
-Choose a Search mode in the sidebar:
+## 🧠 Using the App
 
-Dense — vector search on BGE-small
+1. Type a question (e.g., “What is corporate finance?”).  
+2. Submit.  
+3. The app:
+   - Retrieves top-matching passages from Pinecone using hybrid search  
+   - Builds context for the LLM  
+   - Calls the generator model  
+   - Displays the final grounded answer  
 
-Sparse (BM25) — keyword matching
+If the answer is not supported by the retrieved context, the model will respond: **“I don’t know.”**
 
-Hybrid (RRF) — fuses dense & sparse via Reciprocal Rank Fusion
+---
 
-(Dense) Toggle exact search if desired
+## ⚙️ Configuration
 
-(Hybrid) Tune dense_k and sparse_k prefetch sizes
+### Pinecone connection
+- `PINECONE_API_KEY` must be set  
+- `PINECONE_INDEX_NAME` defaults to `fiqa-hybrid`  
+- The code will create the index automatically if it doesn’t exist (serverless spec)
 
-## Configuration
-### Qdrant connection
-QDRANT_URL="http://localhost:6333"
+### BM25 state
+- `BM25_STATE_PATH` must point to `bm25_values.json`  
+- This file is produced once during ingestion  
+- Without it, retrieval fails with:  
+  `RuntimeError: BM25 state not found ... (dump it first)`
 
-### Collection name to query
-QDRANT_COLLECTION="fiqa-hybrid"
+### Generator model
+- Uses `gpt-4o-mini` via `langchain-openai`  
 
-### Dense embedding model used by FastEmbed
-EMBED_MODEL="BAAI/bge-small-en-v1.5"
+### Embedding model
+- Dense encoder: `sentence-transformers/all-MiniLM-L6-v2`
 
-## Retrieval Evaluation
+---
 
-An example run over 500 queries(dev.tsv) @ k=10 produced:
+## 📊 Retrieval Evaluation
 
-<img width="581" height="423" alt="image" src="https://github.com/user-attachments/assets/f985173d-1c0a-407d-8b6f-9edbd30db189" />
+You can batch-score the system with:
 
+```bash
+python evaluation.py
+```
 
+This script:
+- Loads a list of test queries (`fiqa/queries.jsonl`)
+- Builds the same retriever + RAG chain as the app
+- Generates answers and evaluates them using a judge model (`gpt-4o-mini`)
+- Computes:
+  - **correctness** — does the answer address the question accurately and completely?  
+  - **groundedness** — is it supported only by retrieved context?
 
-## Rag Evaluation
+Results are saved to **`eval_results.csv`**.
 
-Evaluator prompt (system + user)
+### Example output columns
+| Field | Description |
+|--------|--------------|
+| question | The query asked |
+| answer | Model-generated response |
+| correctness | Score (0–1) |
+| groundedness | Score (0–1) |
+| judge_notes | Short textual rationale |
 
-The answer is injected verbatim between <<<ANSWER>>> and <<<END>>> to avoid accidental prompt mixing.
+---
 
-The evaluator is instructed to output JSON only (no prose, no backticks), so downstream parsing is reliable.
+## 📈 Metrics & Reporting
 
-## Inputs to the evaluator
+From the evaluation CSV you can compute:
 
-For each example:
+- Overall relevance / correctness rate  
+- Groundedness (hallucination control)  
+- Breakdowns by retrieval configuration  
+- Slices of low-performing examples for manual inspection  
 
-question: the user query.
+Higher groundedness = stronger retrieval-grounded responses.
 
-context: the retrieved snippets the generator saw (the notebook builds these earlier).
+---
 
-answer: the generator’s output (verbatim).
+## 🔄 How It Works (End-to-End)
 
-The context is not pasted directly into the evaluator prompt body shown above; instead, the rubric requires the evaluator to judge grounding against the same context that produced the answer. (Implementation-wise, the notebook wraps or references that context when calling the evaluator model so the judgment is actually conditioned on it.)
+1. **Chunking & Embedding**  
+   Split finance data into passages → create dense embeddings and BM25 sparse vectors.  
 
-## Batch evaluation loop
+2. **Indexing**  
+   Create Pinecone index → upsert dense + sparse + metadata.  
 
-For each retrieval mode (dense, sparse, rrf) and for each evaluation query:
+3. **Querying**  
+   Load BM25 + dense encoder → perform hybrid retrieval via `PineconeHybridSearchRetriever`.  
 
-Retrieve context (K results).
+4. **Answering**  
+   Retrieved docs → passed as `context` to `gpt-4o-mini` → returns a concise, grounded answer.  
 
-Generate the answer with the RAG model.
+5. **Evaluation**  
+   Use `evaluation.py` to assess correctness & groundedness with the same LLM as a judge.
 
-Evaluate using JSON judgment.
+---
 
-Log the outcome (question, answer, label, and explanation)
+## 🙌 Acknowledgements
 
-The notebook uses a progress bar (tqdm) and caches intermediate results in memory; you can export to CSV/JSON if desired.
+- **Pinecone** for hybrid dense/sparse retrieval and vector storage  
+- **pinecone-text** for BM25Encoder  
+- **sentence-transformers** for MiniLM embeddings  
+- **LangChain** for retrieval + RAG orchestration  
+- **OpenAI gpt-4o-mini** for answering and judging  
 
-## Metrics & reporting
+---
 
-From the collected judgments the notebook computes:
-
-Relevance rate (accuracy):
-#(RELEVANT) / total, per mode and overall.
-
-Breakdown by retrieval mode: dense vs. sparse vs. RRF.
-
-Error slices:
-
-Examples flagged IRRELEVANT with evaluator explanations.
-
-Random samples of RELEVANT cases for manual spot-checks.
-
-## What the outputs mean
-
-A high RELEVANT rate under RRF indicates the hybrid retriever is delivering better grounding than dense-only or sparse-only.
-
-IRRELEVANT examples + explanations help you pinpoint:
-
-missing/weak context,
-
-generator drift (generic answers),
-
-or contradictions with retrieved facts.
-
-## How It Works 
-
-1. Chunking & Embedding
-
-Split finance texts / notebooks into passages
-
-Generate dense embeddings with BAAI/bge-small-en-v1.5 via FastEmbed
-
-2. Indexing
-
-Store dense vectors and payloads in Qdrant
-
-Enable bm25 for sparse retrieval on the same collection
-
-3. Querying
-
-Dense: cosine/L2 over normalized dense vectors
-
-Sparse: bm25
-
-Hybrid: RRF merges two ranked lists (configurable prefetch sizes)
-
-4. UI
-
-Streamlit app queries Qdrant and renders the top-1 passage with source
-
-Toggle modes and parameters from the sidebar
-
-## Acknowledgements
-
-Qdrant for vector database & BM25 hybrid support
-
-FastEmbed for blazing-fast embedding inference
-
-BAAI/bge-small-en-v1.5 for strong retrieval performance
-
-## License
+## 🪪 License
 
 Add your preferred license (e.g., MIT) to this repository.
