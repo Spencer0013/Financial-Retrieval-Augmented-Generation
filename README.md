@@ -3,7 +3,8 @@
 A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone hybrid search (dense + sparse)**, `sentence-transformers` embeddings, and a Streamlit app for interactive querying. It includes notebooks for data prep and evaluation plus a lightweight UI that returns an answer grounded in the top-ranked passage.
 
 ## Demo (Screenshot)
-<img width="1858" height="1010" alt="Screenshot 2025-10-31 110219" src="https://github.com/user-attachments/assets/f59549eb-ce46-4b26-a2c0-8175b0aa464d" />
+<img width="1863" height="1006" alt="Screenshot 2025-10-31 112624" src="https://github.com/user-attachments/assets/cdf4ae86-c3bb-4f02-ae3a-04278ca1cb64" />
+
 
 
 ---
