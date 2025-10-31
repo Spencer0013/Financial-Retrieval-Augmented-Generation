@@ -1,3 +1,17 @@
+---
+title: Financial RAG Demo (FiQA)
+emoji: 📊
+colorFrom: indigo
+colorTo: cyan
+sdk: streamlit
+app_file: app.py
+pinned: false
+license: mit
+---
+
+
+
+
 ## Financial Retrieval-Augmented Generation (RAG) — Finance Domain
 
 A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone hybrid search (dense + sparse)**, `sentence-transformers` embeddings, and a Streamlit app for interactive querying. It includes notebooks for data prep and evaluation plus a lightweight UI that returns an answer grounded in the top-ranked passage.
