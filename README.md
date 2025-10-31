@@ -3,7 +3,8 @@
 A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone hybrid search (dense + sparse)**, `sentence-transformers` embeddings, and a Streamlit app for interactive querying. It includes notebooks for data prep and evaluation plus a lightweight UI that returns an answer grounded in the top-ranked passage.
 
 ## Demo (Screenshot)
-<img width="1918" height="1004" alt="Screenshot 2025-09-29 101201" src="https://github.com/user-attachments/assets/36f6736a-7372-4a75-a340-a2e039f3f264" />
+<img width="1858" height="1010" alt="Screenshot 2025-10-31 110219" src="https://github.com/user-attachments/assets/f59549eb-ce46-4b26-a2c0-8175b0aa464d" />
+
 
 ---
 
@@ -35,7 +36,7 @@ A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone
 
 ---
 
-## 1️⃣ Start / Prepare Pinecone
+## 1️ Start / Prepare Pinecone
 
 You do not run Pinecone locally with Docker — it’s a managed service.  
 Instead:
@@ -51,7 +52,7 @@ Instead:
 
 ---
 
-## 2️⃣ Create the Index & Upload Vectors
+##  Create the Index & Upload Vectors
 
 The workflow in `data_preparation.ipynb` / ingestion script does the following:
 
@@ -66,13 +67,13 @@ The workflow in `data_preparation.ipynb` / ingestion script does the following:
 - Compute dense embeddings with `sentence-transformers/all-MiniLM-L6-v2`
 - Upsert **both** dense and sparse vectors into the Pinecone index along with metadata
 
-> ⚠️ After you upsert once, your vectors live in Pinecone permanently.  
+>  After you upsert once, your vectors live in Pinecone permanently.  
 > You do **not** need to re-upsert unless you add new data.  
 > Keep the `bm25_values.json` file — it’s required at query time to encode new user queries into sparse form.
 
 ---
 
-## 3️⃣ Run the App
+##  Run the App
 
 Set your environment variables in a `.env` file or via shell.  
 **Required:**
@@ -101,7 +102,7 @@ streamlit run app.py
 
 ---
 
-## 🧠 Using the App
+##  Using the App
 
 1. Type a question (e.g., “What is corporate finance?”).  
 2. Submit.  
@@ -136,7 +137,7 @@ If the answer is not supported by the retrieved context, the model will respond:
 
 ---
 
-## 📊 Retrieval Evaluation
+##  Retrieval Evaluation
 
 You can batch-score the system with:
 
@@ -165,7 +166,7 @@ Results are saved to **`eval_results.csv`**.
 
 ---
 
-## 📈 Metrics & Reporting
+##  Metrics & Reporting
 
 From the evaluation CSV you can compute:
 
@@ -178,7 +179,7 @@ Higher groundedness = stronger retrieval-grounded responses.
 
 ---
 
-## 🔄 How It Works (End-to-End)
+##  How It Works (End-to-End)
 
 1. **Chunking & Embedding**  
    Split finance data into passages → create dense embeddings and BM25 sparse vectors.  
@@ -197,7 +198,7 @@ Higher groundedness = stronger retrieval-grounded responses.
 
 ---
 
-## 🙌 Acknowledgements
+## Acknowledgements
 
 - **Pinecone** for hybrid dense/sparse retrieval and vector storage  
 - **pinecone-text** for BM25Encoder  
