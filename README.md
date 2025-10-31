@@ -2,7 +2,7 @@
 title: Financial RAG Demo (FiQA)
 emoji: 📊
 colorFrom: indigo
-colorTo: cyan
+colorTo: green
 sdk: streamlit
 app_file: app.py
 pinned: false
