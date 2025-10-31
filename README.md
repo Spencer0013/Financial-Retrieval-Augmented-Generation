@@ -1,6 +1,6 @@
-## Financial Retrieval-Augmented Generation (RAG) — Finance Domain
+## Financial Retrieval-Augmented Generation - Finance Domain
 
-A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone hybrid search (dense + sparse)**, `sentence-transformers` embeddings, and a Streamlit app for interactive querying. It includes notebooks for data prep and evaluation plus a lightweight UI that returns an answer grounded in the top-ranked passage.
+A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone hybrid search (dense + sparse)**, `sentence-transformers`embeddings, and a Streamlit app for interactive querying.
 
 ## Demo (Screenshot)
 <img width="1863" height="1006" alt="Screenshot 2025-10-31 112624" src="https://github.com/user-attachments/assets/cdf4ae86-c3bb-4f02-ae3a-04278ca1cb64" />
@@ -33,13 +33,11 @@ A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone
 └── README.md
 ```
 
-> **Note:** earlier versions referenced Qdrant. The current pipeline uses **Pinecone** as the vector DB and hybrid retriever.
-
 ---
 
-## 1️ Start / Prepare Pinecone
+## Start / Prepare Pinecone
 
-You do not run Pinecone locally with Docker — it’s a managed service.  
+You do not run Pinecone locally with Docker — it’s a managed service. 
 Instead:
 
 1. Create a Pinecone account / API key.  
