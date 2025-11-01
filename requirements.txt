@@ -1,0 +1,17 @@
+pinecone
+pinecone-text
+pinecone-notebooks
+ipykernel
+langchain==0.2.16
+langchain-community==0.2.16
+langchain-openai==0.1.23
+python-dotenv
+streamlit
+langserve
+fastapi
+uvicorn
+sse-starlette
+bs4
+sentence-transformers
+langchain-huggingface
+hf_transfer
