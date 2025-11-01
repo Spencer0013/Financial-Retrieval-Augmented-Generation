@@ -12,3 +12,4 @@ offload_cache/
 data/*
 !data/df_eval.csv
 !data/.gitkeep
+".env" 
