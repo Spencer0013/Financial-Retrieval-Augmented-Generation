@@ -35,10 +35,8 @@ A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone
 
 ---
 
-## Start / Prepare Pinecone
+## Prepare Pinecone
 
-You do not run Pinecone locally with Docker — it’s a managed service. 
-Instead:
 
 1. Create a Pinecone account / API key.  
 2. Set environment variables (see below).  
@@ -51,7 +49,7 @@ Instead:
 
 ---
 
-##  Create the Index & Upload Vectors
+##  Index & Upload Vectors
 
 The workflow in `data_preparation.ipynb` / ingestion script does the following:
 
@@ -65,10 +63,6 @@ The workflow in `data_preparation.ipynb` / ingestion script does the following:
   ```
 - Compute dense embeddings with `sentence-transformers/all-MiniLM-L6-v2`
 - Upsert **both** dense and sparse vectors into the Pinecone index along with metadata
-
->  After you upsert once, your vectors live in Pinecone permanently.  
-> You do **not** need to re-upsert unless you add new data.  
-> Keep the `bm25_values.json` file — it’s required at query time to encode new user queries into sparse form.
 
 ---
 
@@ -111,11 +105,9 @@ streamlit run app.py
    - Calls the generator model  
    - Displays the final grounded answer  
 
-If the answer is not supported by the retrieved context, the model will respond: **“I don’t know.”**
-
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ### Pinecone connection
 - `PINECONE_API_KEY` must be set  
@@ -206,7 +198,6 @@ Higher groundedness = stronger retrieval-grounded responses.
 - **OpenAI gpt-4o-mini** for answering and judging  
 
 ---
-
-## 🪪 License
+## License
 
 Add your preferred license (e.g., MIT) to this repository.
