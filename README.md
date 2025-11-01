@@ -45,7 +45,7 @@ A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone
 **Index details (from `helpers.py`):**
 - Dimension: `384`
 - Metric: `dotproduct`
-- Cloud/region: `aws` / `us-east-1` (can be changed in code)
+- Cloud/region: `aws` / `us-east-1` 
 
 ---
 
