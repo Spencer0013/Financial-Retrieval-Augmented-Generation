@@ -1,9 +1,11 @@
-## Financial Retrieval-Augmented Generation (RAG) — Finance Domain
+## Financial Retrieval-Augmented Generation - Finance Domain
 
-A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone hybrid search (dense + sparse)**, `sentence-transformers` embeddings, and a Streamlit app for interactive querying. It includes notebooks for data prep and evaluation plus a lightweight UI that returns an answer grounded in the top-ranked passage.
+A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone hybrid search (dense + sparse)**, `sentence-transformers`embeddings, and a Streamlit app for interactive querying.
 
 ## Demo (Screenshot)
-<img width="1918" height="1004" alt="Screenshot 2025-09-29 101201" src="https://github.com/user-attachments/assets/36f6736a-7372-4a75-a340-a2e039f3f264" />
+<img width="1863" height="1006" alt="Screenshot 2025-10-31 112624" src="https://github.com/user-attachments/assets/cdf4ae86-c3bb-4f02-ae3a-04278ca1cb64" />
+
+
 
 ---
 
@@ -31,14 +33,10 @@ A practical, end-to-end RAG pipeline for finance questions powered by **Pinecone
 └── README.md
 ```
 
-> **Note:** earlier versions referenced Qdrant. The current pipeline uses **Pinecone** as the vector DB and hybrid retriever.
-
 ---
 
-## 1️⃣ Start / Prepare Pinecone
+## Prepare Pinecone
 
-You do not run Pinecone locally with Docker — it’s a managed service.  
-Instead:
 
 1. Create a Pinecone account / API key.  
 2. Set environment variables (see below).  
@@ -51,7 +49,7 @@ Instead:
 
 ---
 
-## 2️⃣ Create the Index & Upload Vectors
+##  Index & Upload Vectors
 
 The workflow in `data_preparation.ipynb` / ingestion script does the following:
 
@@ -66,13 +64,9 @@ The workflow in `data_preparation.ipynb` / ingestion script does the following:
 - Compute dense embeddings with `sentence-transformers/all-MiniLM-L6-v2`
 - Upsert **both** dense and sparse vectors into the Pinecone index along with metadata
 
-> ⚠️ After you upsert once, your vectors live in Pinecone permanently.  
-> You do **not** need to re-upsert unless you add new data.  
-> Keep the `bm25_values.json` file — it’s required at query time to encode new user queries into sparse form.
-
 ---
 
-## 3️⃣ Run the App
+##  Run the App
 
 Set your environment variables in a `.env` file or via shell.  
 **Required:**
@@ -101,7 +95,7 @@ streamlit run app.py
 
 ---
 
-## 🧠 Using the App
+##  Using the App
 
 1. Type a question (e.g., “What is corporate finance?”).  
 2. Submit.  
@@ -111,11 +105,9 @@ streamlit run app.py
    - Calls the generator model  
    - Displays the final grounded answer  
 
-If the answer is not supported by the retrieved context, the model will respond: **“I don’t know.”**
-
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ### Pinecone connection
 - `PINECONE_API_KEY` must be set  
@@ -136,7 +128,7 @@ If the answer is not supported by the retrieved context, the model will respond:
 
 ---
 
-## 📊 Retrieval Evaluation
+##  Retrieval Evaluation
 
 You can batch-score the system with:
 
@@ -165,7 +157,7 @@ Results are saved to **`eval_results.csv`**.
 
 ---
 
-## 📈 Metrics & Reporting
+##  Metrics & Reporting
 
 From the evaluation CSV you can compute:
 
@@ -178,7 +170,7 @@ Higher groundedness = stronger retrieval-grounded responses.
 
 ---
 
-## 🔄 How It Works (End-to-End)
+##  How It Works (End-to-End)
 
 1. **Chunking & Embedding**  
    Split finance data into passages → create dense embeddings and BM25 sparse vectors.  
@@ -197,7 +189,7 @@ Higher groundedness = stronger retrieval-grounded responses.
 
 ---
 
-## 🙌 Acknowledgements
+## Acknowledgements
 
 - **Pinecone** for hybrid dense/sparse retrieval and vector storage  
 - **pinecone-text** for BM25Encoder  
@@ -206,7 +198,6 @@ Higher groundedness = stronger retrieval-grounded responses.
 - **OpenAI gpt-4o-mini** for answering and judging  
 
 ---
-
-## 🪪 License
+## License
 
 Add your preferred license (e.g., MIT) to this repository.
